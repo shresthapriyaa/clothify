@@ -1,110 +1,45 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import prisma from "@/lib/prisma";
-
-// // DELETE order
-// export async function DELETE(
-//     request: NextRequest,
-//     { params }: { params: { id: string } }
-// ) {
-//     try {
-//         const { id } = params;
-
-//         // Delete order items first, then order
-//         await prisma.orderItem.deleteMany({
-//             where: { orderId: id }
-//         });
-
-//         await prisma.order.delete({
-//             where: { id }
-//         });
-
-//         return NextResponse.json({
-//             success: true,
-//             message: "Order deleted successfully"
-//         }, { status: 200 });
-//     } catch (error: any) {
-//         console.error("Error deleting order:", error);
-//         return NextResponse.json({
-//             error: error.message || "Failed to delete order",
-//             success: false
-//         }, { status: 500 });
-//     }
-// }
-
-// // PUT update order
-// export async function PUT(
-//     request: NextRequest,
-//     { params }: { params: { id: string } }
-// ) {
-//     try {
-//         const { id } = params;
-//         const body = await request.json();
-//         const { userId, items, total } = body;
-
-//         // Calculate prices for each item
-//         const itemsWithPrices = await Promise.all(
-//             items.map(async (item: any) => {
-//                 const product = await prisma.product.findUnique({
-//                     where: { id: item.productId }
-//                 });
-                
-//                 return {
-//                     productId: item.productId,
-//                     quantity: item.quantity,
-//                     size: item.size,
-//                     color: item.color,
-//                     price: product?.price || 0
-//                 };
-//             })
-//         );
-
-//         const productsString = items.map((item: any) => item.productId).join(',');
-
-//         // Delete existing items
-//         await prisma.orderItem.deleteMany({
-//             where: { orderId: id }
-//         });
-
-//         // Update order with new items
-//         const order = await prisma.order.update({
-//             where: { id },
-//             data: {
-//                 userId,
-//                 total,
-//                 products: productsString,
-//                 items: {
-//                     create: itemsWithPrices
-//                 }
-//             },
-//             include: {
-//                 items: {
-//                     include: {
-//                         product: true
-//                     }
-//                 },
-//                 user: true
-//             }
-//         });
-
-//         return NextResponse.json({
-//             data: order,
-//             success: true
-//         }, { status: 200 });
-//     } catch (error: any) {
-//         console.error("Error updating order:", error);
-//         return NextResponse.json({
-//             error: error.message || "Failed to update order",
-//             success: false
-//         }, { status: 500 });
-//     }
-// }
-
-
-
-
 
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    if (!id)
+      return NextResponse.json({ error: "Must provide id" }, { status: 400 });
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        items: {
+          include: {
+            product: true
+          }
+        }
+      }
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(order, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 
 // DELETE – remove an order and its items
 export async function DELETE(

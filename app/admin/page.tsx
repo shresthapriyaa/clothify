@@ -69,65 +69,65 @@ function AdminDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Users */}
-        <div className="bg-black  border-b-4 border-t-4 text-white rounded-lg p-6 shadow-lg">
+        <div className="bg-white  border-b-4 border-t-4 text-black rounded-lg p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white text-sm">Total Users</p>
+              <p className="text-black text-sm">Total Users</p>
               <h2 className="text-3xl font-bold mt-1">{stats.totalUsers}</h2>
             </div>
-            <Users className="h-12 w-12 text-white" />
+            <Users className="h-12 w-12 text-black" />
           </div>
         </div>
 
         {/* Total Products */}
-        <div className="bg-black border-b-4 border-t-4 text-white rounded-lg p-6 shadow-lg">
+        <div className="bg-white border-b-4 border-t-4 text-black rounded-lg p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white text-sm">Total Products</p>
+              <p className="text-blacktext-sm">Total Products</p>
               <h2 className="text-3xl font-bold mt-1">{stats.totalProducts}</h2>
             </div>
-            <Package className="h-12 w-12 text-white" />
+            <Package className="h-12 w-12 text-black" />
           </div>
         </div>
 
         {/* Total Orders */}
-        <div className="bg-black border-b-4 border-t-4 text-white rounded-lg p-6 shadow-lg">
+        <div className="bg-white border-b-4 border-t-4 text-black rounded-lg p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white text-sm">Total Orders</p>
+              <p className="text-black text-sm">Total Orders</p>
               <h2 className="text-3xl font-bold mt-1">{stats.totalOrders}</h2>
             </div>
-            <ShoppingCart className="h-12 w-12 text-white" />
+            <ShoppingCart className="h-12 w-12 text-black" />
           </div>
         </div>
 
         {/* Total Revenue */}
-        <div className="bg-black border-b-4 border-t-4 text-white rounded-lg p-6 shadow-lg">
+        <div className="bg-white border-b-4 border-t-4 text-black rounded-lg p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white text-sm">Total Revenue</p>
+              <p className="text-blacktext-sm">Total Revenue</p>
               <h2 className="text-3xl font-bold mt-1">${stats.totalRevenue.toFixed(2)}</h2>
             </div>
-            <DollarSign className="h-12 w-12 text-white" />
+            <DollarSign className="h-12 w-12 text-black" />
           </div>
         </div>
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-black rounded-lg shadow-lg p-6 mb-8">
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
         <div className="flex items-center gap-2 mb-4">
-          
-          <h2 className="text-2xl   text-white font-bold">Recent Orders</h2>
+      
+          <h2 className="text-2xl   text-black font-bold">Recent Orders</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full ">
             <thead>
-              <tr className="border-b-4 border-t-4 bg-black rounded-2xl  hover:bg-gray-600 ">
-                <th className="text-left  text-white p-4">Order ID</th>
-                <th className="text-left  text-white p-4">User</th>
-                <th className="text-left text-white  p-4">Total</th>
-                <th className="text-left text-white  p-4">Date</th>
+              <tr className="border-b-4 border-t-4 bg-white rounded-2xl  hover:bg-gray-600 ">
+                <th className="text-left  text-black p-4">Order ID</th>
+                <th className="text-left  text-black p-4">User</th>
+                <th className="text-left text-black p-4">Total</th>
+                <th className="text-left text-black p-4">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -139,7 +139,7 @@ function AdminDashboard() {
                 </tr>
               ) : (
                 recentOrders.map((order) => (
-                  <tr key={order.id} className="border-b text-white hover:bg-gray-700">
+                  <tr key={order.id} className="border-b text-black hover:bg-gray-300">
                     <td className="p-4 font-mono text-sm">
                       {order.id.slice(0, 8)}...
                     </td>
@@ -149,7 +149,7 @@ function AdminDashboard() {
                     <td className="p-4 font-semibold">
                       ${order.total.toFixed(2)}
                     </td>
-                    <td className="p-4 text-sm text-white">
+                    <td className="p-4 text-sm text-black">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
@@ -164,33 +164,33 @@ function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <a 
           href="/admin/product"
-          className="bg-black border-2 border-b-4 border-t-4  rounded-lg p-6 hover:shadow-lg transition-shadow block"
+          className="bg-white border-2 border-b-4 border-t-4  rounded-lg p-6 hover:shadow-lg transition-shadow block"
         >
-          <h3 className="font-bold  text-white text-lg mb-2">📦 Manage Products</h3>
-          <p className="text-white text-sm mb-4">Add, edit, or remove products from your store</p>
-          <span className="text-white hover:underline">
+          <h3 className="font-bold  text-black text-lg mb-2">📦 Manage Products</h3>
+          <p className="text-black text-sm mb-4">Add, edit, or remove products from your store</p>
+          <span className="text-black hover:underline">
             Go to Products →
           </span>
         </a>
 
         <a 
           href="/admin/orders"
-          className="bg-black border-2 border-b-4 border-t-4  rounded-lg p-6 hover:shadow-lg transition-shadow block"
+          className="bg-white border-2 border-b-4 border-t-4  rounded-lg p-6 hover:shadow-lg transition-shadow block"
         >
-          <h3 className="font-bold text-white text-lg mb-2">🛒 View Orders</h3>
-          <p className="text-sm  text-white mb-4">Manage and process customer orders</p>
-          <span className=" text-white hover:underline">
+          <h3 className="font-bold text-black text-lg mb-2">🛒 View Orders</h3>
+          <p className="text-sm  text-black mb-4">Manage and process customer orders</p>
+          <span className=" text-black hover:underline">
             Go to Orders →
           </span>
         </a>
 
         <a 
           href="/admin/user"
-          className="bg-black border-2 border-b-4 border-t-4rounded-lg p-6 hover:shadow-lg transition-shadow block"
+          className="bg-white border-2 border-b-4 border-t-4 rounded-lg p-6 hover:shadow-lg transition-shadow block"
         >
-          <h3 className="font-bold  text-white text-lg mb-2">👥 Manage Users</h3>
-          <p className="text-white text-sm mb-4">View and manage user accounts</p>
-          <span className="text-white hover:underline">
+          <h3 className="font-bold  text-black text-lg mb-2">👥 Manage Users</h3>
+          <p className="text-black text-sm mb-4">View and manage user accounts</p>
+          <span className="text-black hover:underline">
             Go to Users →
           </span>
         </a>

@@ -20,19 +20,19 @@ interface ITableProps {
 
 export function TableDemo({ users, handleUpdateLocalState }: ITableProps) {
     return (
-      <div className="p-8 min-h-screen bg-black text-white min-w-full rounded-2xl border-b-4 border-t-4">
-        <div className="border border-gray-700 rounded-lg border-b-4 border-t-4">
+      <div className=" bg-white text-black min-w-full rounded-2xl overflow-x-auto">
+        <div className="border border-black/10 rounded-lg overflow-autoborder-b-4 border-t-4">
           <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[100] font-semibold text-white  text-left px-4 py2 border-b-2">ID</TableHead>
-                    <TableHead className="text-white   px-4 py2 font-semibold  border-b-2">NAME</TableHead>
-                    <TableHead className="text-white  px-4 py-2 text-left font-semibold border-b-2">EMAIL</TableHead>
-                    {/* <TableHead className="text-white font-semibold border-b-2">AGE</TableHead> */}
-                    <TableHead className="text-white px-4 py-2 text-left font-semibold border-b-2">ISVERIFIED</TableHead>
-                    <TableHead className="text-white px-4 py-2 text-left font-semibold border-b-2">ROLE</TableHead>
-                    <TableHead className="text-white  px-4 py-2 text-left font-semibold border-b-2">PASSWORD</TableHead>
-                    <TableHead className=" px-4 py-2 text-right font-semibold text-white border-b-2">ACTIONS</TableHead>
+                    <TableHead className="w-[100] font-semibold text-black  text-left px-4 py2 border-b-2">ID</TableHead>
+                    <TableHead className="text-black  px-4 py2 font-semibold  border-b-2">NAME</TableHead>
+                    <TableHead className="text-black px-4 py-2 text-left font-semibold border-b-2">EMAIL</TableHead>
+                
+                    <TableHead className="text-black px-4 py-2 text-left font-semibold border-b-2">ISVERIFIED</TableHead>
+                    <TableHead className="text-black px-4 py-2 text-left font-semibold border-b-2">ROLE</TableHead>
+                    <TableHead className="text-black px-4 py-2 text-left font-semibold border-b-2">PASSWORD</TableHead>
+                    <TableHead className=" px-4 py-2 text-right font-semibold text-black border-b-2">ACTIONS</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

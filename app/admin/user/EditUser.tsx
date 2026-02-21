@@ -1,7 +1,3 @@
-
-
- 
-
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -122,7 +118,7 @@ export function EditUser({ user, handleUpdateLocalState }: IAddUserProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size={'icon'}>
+                <Button size={'icon'} variant="outline" className="bg-white hover:bg-black/15">
                     <Edit />
                 </Button>
             </DialogTrigger>
@@ -230,4 +226,15 @@ export function EditUser({ user, handleUpdateLocalState }: IAddUserProps) {
         </Dialog>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
 

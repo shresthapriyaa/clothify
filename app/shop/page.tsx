@@ -3,24 +3,25 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import WishlistButton from '@/components/WishlistButton';
+import { ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
   name: string;
   price: number;
   image: string;
-  categoryId: string;
-  sizes: string[];
-  colors: string[];
-  isBest: boolean;
-  isPopular: boolean;
-  isSale: boolean;
   category: {
     id: string;
     name: string;
-    slug: string;
   };
+  sizes: string[];
+  colors: string[];
 }
 
 export default function ShopPage() {
@@ -43,7 +44,6 @@ export default function ShopPage() {
         localStorage.setItem('guestUserId', userId);
       }
 
-      // Create guest user in database
       await fetch('/api/users/guest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,6 +55,7 @@ export default function ShopPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
       });
+
       const data = await res.json();
       setCartId(data.cartId);
     } catch (error) {
@@ -69,14 +70,18 @@ export default function ShopPage() {
       setProducts(result.data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
+      toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
   };
 
-  const addToCart = async (product: Product) => {
+  const addToCart = async (product: Product, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!cartId) {
-      alert('Initializing cart, please try again...');
+      toast.error('Initializing cart, please try again...');
       await initializeCart();
       return;
     }
@@ -95,124 +100,130 @@ export default function ShopPage() {
       });
 
       if (response.ok) {
-        if (confirm('Item added to cart! Go to cart?')) {
-          router.push('/cart');
-        }
+        toast.success('Added to cart!');
       } else {
-        alert('Failed to add to cart');
+        toast.error('Failed to add to cart');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Failed to add to cart');
+      toast.error('Failed to add to cart');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading products...</div>
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 aspect-square rounded-xl mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">All Products</h1>
-          <button
-            onClick={() => router.push('/cart')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            View Cart
-          </button>
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Shop All Products</h1>
+          <p className="text-gray-600">Discover our collection of premium products</p>
         </div>
 
         {products.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-xl text-gray-600">No products found</p>
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-600 mb-2">No products found</p>
+            <p className="text-gray-500">Check back soon for new items</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div
+              <Link
                 key={product.id}
-                className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow"
+                href={`/products/${product.id}`}
+                className="block"
               >
-                <div className="relative h-64 w-full overflow-hidden">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={400}
-                    height={256}
-                    className="object-cover w-full h-full"
-                  />
+                <div className="bg-white rounded-xl border overflow-hidden">
                   
-                  <div className="absolute top-2 right-2 flex flex-col gap-2">
-                    {product.isBest && (
-                      <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-                        Best
-                      </span>
-                    )}
-                    {product.isPopular && (
-                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
-                        Popular
-                      </span>
-                    )}
-                    {product.isSale && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        Sale
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    {product.category.name}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-bold text-blue-600">
-                      ${product.price.toFixed(2)}
-                    </span>
+                  <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover"
+                    />
+                    
+                    {/* Wishlist Button  */}
+                    <div className="absolute top-3 left-3 z-10">
+                      <WishlistButton 
+                        product={product}
+                        className="bg-white/90 p-2 rounded-full shadow-lg"
+                      />
+                    </div>
                   </div>
 
-                  <div className="mb-4">
-                    {product.sizes.length > 0 && (
-                      <div className="mb-2">
-                        <span className="text-xs text-gray-600">Sizes: </span>
-                        <span className="text-xs font-medium">
-                          {product.sizes.join(', ')}
-                        </span>
+                  <div className="p-5">
+                    <div className="mb-2">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide">
+                        {product.category.name}
+                      </span>
+                    </div>
+                    
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                      {product.name}
+                    </h3>
+
+                    {(product.sizes.length > 0 || product.colors.length > 0) && (
+                      <div className="mb-3 text-xs text-gray-600 space-y-1">
+                        {product.sizes.length > 0 && (
+                          <div>
+                            <span className="font-medium">Sizes:</span> {product.sizes.slice(0, 3).join(', ')}
+                            {product.sizes.length > 3 && '...'}
+                          </div>
+                        )}
+                        {product.colors.length > 0 && (
+                          <div>
+                            <span className="font-medium">Colors:</span> {product.colors.slice(0, 3).join(', ')}
+                            {product.colors.length > 3 && '...'}
+                          </div>
+                        )}
                       </div>
                     )}
-                    {product.colors.length > 0 && (
-                      <div>
-                        <span className="text-xs text-gray-600">Colors: </span>
-                        <span className="text-xs font-medium">
-                          {product.colors.join(', ')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
 
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium"
-                  >
-                    Add to Cart
-                  </button>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      
+                      <button
+                        onClick={(e) => addToCart(product, e)}
+                        className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                        title="Add to cart"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 }

@@ -1,7 +1,4 @@
 
-// =====================================================
-// FILE 1: app/api/users/guest/route.ts (CREATE NEW)
-// =====================================================
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -11,8 +8,13 @@ export async function POST(req: NextRequest) {
     
     if (!guestId) {
       return NextResponse.json(
-        { error: 'Guest ID required' },
-        { status: 400 }
+
+        { 
+          error: 'Guest ID required' 
+        },
+        { 
+          status: 400 
+        }
       );
     }
     

@@ -35,7 +35,10 @@ export function TableCategories({ categories, handleUpdateLocalState }: ITableCa
 
     return (
         <>
-            <Table>
+            
+        <div className=" bg-white text-black min-w-full rounded-2xl">
+            <div className="border border-black/20 rounded-lg border-b-4 border-t-4">
+                <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>ID</TableHead>
@@ -52,7 +55,7 @@ export function TableCategories({ categories, handleUpdateLocalState }: ITableCa
                         <TableRow key={category.id}>
                             <TableCell className="font-mono text-sm">{category.id.slice(0, 8)}...</TableCell>
                             <TableCell className="font-medium">{category.name}</TableCell>
-                            <TableCell className="text-gray-500 font-mono text-sm">{category.slug}</TableCell>
+                            <TableCell className="text-black font-mono text-sm">{category.slug}</TableCell>
                             <TableCell>
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     {category._count?.products || 0} products
@@ -101,6 +104,8 @@ export function TableCategories({ categories, handleUpdateLocalState }: ITableCa
                     handleUpdateLocalState={handleUpdateLocalState}
                 />
             )}
+            </div>
+        </div>
         </>
     )
 }

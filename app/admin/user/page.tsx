@@ -48,7 +48,7 @@ export default function Adminpage() {
 
 
 
-    return <div className="flex flex-col  m-20  ">
+    return <div className="flex flex-col  m-3  ">
         <div className="flex justify-between">
             <div className="text-xl font-semibold">All Users</div>
             <AddUser  handleUpdateLocalState={handleUpdateLocalState} />

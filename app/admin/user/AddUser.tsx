@@ -1,5 +1,3 @@
-
-
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -86,7 +84,7 @@ export function AddUser({ handleUpdateLocalState }: IAddUserProps) {
         <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <Button variant="outline"
-              className="bg-black text-white hover:bg-amber-100 border-b-4  border-t-4">Add New User</Button>
+              className="bg-white text-black hover:bg-amber-100 border-b-4  border-t-4">Add New User</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-2xl">
                     <DialogHeader>

@@ -60,8 +60,8 @@ function OrdersPage() {
     }
 
     return (
-        <div className="flex flex-col m-20">
-            <div className="flex justify-between mb-6">
+        <div className="flex flex-col m-5">
+            <div className="flex justify-between mb-4">
                 <div className="text-xl font-semibold">All Orders</div>
                 <AddOrder 
                     users={users} 

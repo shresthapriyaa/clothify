@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// GET all orders
+
 export async function GET() {
     try {
         const orders = await prisma.order.findMany({
@@ -43,7 +43,7 @@ export async function GET() {
     }
 }
 
-// POST create new order
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

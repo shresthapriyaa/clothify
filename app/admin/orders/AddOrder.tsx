@@ -98,7 +98,7 @@ export function AddOrder({ users, products, handleUpdateLocalState }: IAddOrderP
             <DialogTrigger asChild>
                 <Button 
                     variant="outline" 
-                    className="bg-black text-white hover:bg-amber-100 border-b-4 border-t-4"
+                    className="bg-white text-black hover:bg-amber-100 border-b-4 border-t-4"
                 >
                     <Plus className="mr-2 h-4 w-4" />
                     Add New Order
@@ -237,3 +237,211 @@ export function AddOrder({ users, products, handleUpdateLocalState }: IAddOrderP
         </Dialog>
     )
 }
+
+
+
+
+
+
+// "use client"
+
+// import React, { useState } from "react"
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+// import { toast } from "sonner"
+// import axios from "axios"
+// import { Plus, Trash2 } from "lucide-react"
+// import { IUser, IProduct, IOrder } from "./types/types"
+
+// interface IAddOrderProps {
+//     users: IUser[]
+//     products: IProduct[]
+//     handleUpdateLocalState: (order: IOrder, type: string) => void
+// }
+
+// export function AddOrder({ users, products, handleUpdateLocalState }: IAddOrderProps) {
+//     const [open, setOpen] = useState(false)
+//     const [loading, setLoading] = useState(false)
+//     const [userId, setUserId] = useState("")
+//     const [items, setItems] = useState([
+//         { productId: "", quantity: 1, size: "", color: "" }
+//     ])
+
+//     const addItem = () => {
+//         setItems([...items, { productId: "", quantity: 1, size: "", color: "" }])
+//     }
+
+//     const removeItem = (index: number) => {
+//         if (items.length > 1) {
+//             setItems(items.filter((_, i) => i !== index))
+//         }
+//     }
+
+//     const updateItem = (index: number, field: string, value: any) => {
+//         const newItems = [...items]
+//         newItems[index] = { ...newItems[index], [field]: value }
+//         setItems(newItems)
+//     }
+
+//     const handleSubmit = async (e: React.FormEvent) => {
+//         e.preventDefault()
+        
+//         if (!userId) {
+//             toast.error("Please select a user")
+//             return
+//         }
+
+//         for (let i = 0; i < items.length; i++) {
+//             if (!items[i].productId || !items[i].size || !items[i].color) {
+//                 toast.error(`Please fill all fields for item ${i + 1}`)
+//                 return
+//             }
+//         }
+
+//         setLoading(true)
+//         try {
+//             const total = items.reduce((acc, item) => {
+//                 const product = products.find(p => p.id === item.productId)
+//                 return acc + (product ? product.price * item.quantity : 0)
+//             }, 0)
+
+//             const response = await axios.post("/api/orders", { userId, items, total })
+            
+//             if (response.status === 201 || response.status === 200) {
+//                 toast.success("Order added successfully")
+//                 handleUpdateLocalState(response.data.data, "add")
+//                 setUserId("")
+//                 setItems([{ productId: "", quantity: 1, size: "", color: "" }])
+//                 setOpen(false)
+//             }
+//         } catch (error: any) {
+//             toast.error(error?.response?.data?.error || "Failed to add order")
+//         } finally {
+//             setLoading(false)
+//         }
+//     }
+
+//     return (
+//         <Dialog open={open} onOpenChange={setOpen}>
+//             <DialogTrigger asChild>
+//                 <Button>
+//                     <Plus className="mr-2 h-4 w-4" />
+//                     Add New Order
+//                 </Button>
+//             </DialogTrigger>
+//             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+//                 <DialogHeader>
+//                     <DialogTitle>Add Order</DialogTitle>
+//                 </DialogHeader>
+
+//                 <form onSubmit={handleSubmit} className="space-y-4">
+                    
+//                     <div>
+//                         <label className="block text-sm font-medium mb-2">User</label>
+//                         <Select value={userId} onValueChange={setUserId}>
+//                             <SelectTrigger>
+//                                 <SelectValue placeholder="Select user" />
+//                             </SelectTrigger>
+//                             <SelectContent>
+//                                 {users.map(u => (
+//                                     <SelectItem key={u.id} value={u.id}>
+//                                         {u.email}
+//                                     </SelectItem>
+//                                 ))}
+//                             </SelectContent>
+//                         </Select>
+//                     </div>
+
+//                     <div className="space-y-3">
+//                         <h3 className="font-medium">Order Items</h3>
+//                         {items.map((item, index) => (
+//                             <div key={index} className="p-4 border rounded space-y-3">
+//                                 <div className="flex justify-between">
+//                                     <span>Item {index + 1}</span>
+//                                     {items.length > 1 && (
+//                                         <Button
+//                                             type="button"
+//                                             variant="destructive"
+//                                             size="sm"
+//                                             onClick={() => removeItem(index)}
+//                                         >
+//                                             <Trash2 className="h-4 w-4" />
+//                                         </Button>
+//                                     )}
+//                                 </div>
+
+//                                 <div>
+//                                     <label className="block text-sm mb-1">Product</label>
+//                                     <Select 
+//                                         value={item.productId} 
+//                                         onValueChange={(val) => updateItem(index, "productId", val)}
+//                                     >
+//                                         <SelectTrigger>
+//                                             <SelectValue placeholder="Select product" />
+//                                         </SelectTrigger>
+//                                         <SelectContent>
+//                                             {products.map(p => (
+//                                                 <SelectItem key={p.id} value={p.id}>
+//                                                     {p.name} - ${p.price}
+//                                                 </SelectItem>
+//                                             ))}
+//                                         </SelectContent>
+//                                     </Select>
+//                                 </div>
+
+//                                 <div>
+//                                     <label className="block text-sm mb-1">Quantity</label>
+//                                     <Input
+//                                         type="number"
+//                                         min="1"
+//                                         value={item.quantity}
+//                                         onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 1)}
+//                                     />
+//                                 </div>
+
+//                                 <div className="grid grid-cols-2 gap-2">
+//                                     <div>
+//                                         <label className="block text-sm mb-1">Size</label>
+//                                         <Input
+//                                             placeholder="M"
+//                                             value={item.size}
+//                                             onChange={(e) => updateItem(index, "size", e.target.value)}
+//                                         />
+//                                     </div>
+//                                     <div>
+//                                         <label className="block text-sm mb-1">Color</label>
+//                                         <Input
+//                                             placeholder="White"
+//                                             value={item.color}
+//                                             onChange={(e) => updateItem(index, "color", e.target.value)}
+//                                         />
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         ))}
+//                     </div>
+
+//                     <Button 
+//                         type="button" 
+//                         variant="outline"
+//                         onClick={addItem}
+//                         className="w-full"
+//                     >
+//                         <Plus className="mr-2 h-4 w-4" />
+//                         Add Item
+//                     </Button>
+
+//                     <Button 
+//                         type="submit" 
+//                         className="w-full"
+//                         disabled={loading}
+//                     >
+//                         {loading ? "Adding..." : "Add Order"}
+//                     </Button>
+//                 </form>
+//             </DialogContent>
+//         </Dialog>
+//     )
+// }

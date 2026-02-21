@@ -1,9 +1,10 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 
 interface CartItem {
   id: string;
@@ -22,6 +23,7 @@ interface CartItem {
 
 export default function CartPage() {
   const router = useRouter();
+
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -30,116 +32,136 @@ export default function CartPage() {
     initializeCart();
   }, []);
 
+  
   const initializeCart = async () => {
     try {
       let userId = localStorage.getItem('guestUserId');
-      
+
       if (!userId) {
         userId = `guest-${Date.now()}`;
         localStorage.setItem('guestUserId', userId);
       }
-      
-      // Create guest user in database first
-      const userRes = await fetch('/api/users/guest', {
+
+      // guest user bhanaunay
+      await fetch('/api/users/guest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guestId: userId })
+        body: JSON.stringify({ guestId: userId }),
       });
-      
-      if (!userRes.ok) {
-        console.error('Failed to create guest user');
-        setLoading(false);
-        return;
-      }
-      
-      // Now create/get cart
+
+     //create or fetch garnay cart
       const cartRes = await fetch('/api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId }),
       });
-      
-      if (!cartRes.ok) {
-        console.error('Cart API error:', await cartRes.text());
-        setLoading(false);
-        return;
-      }
 
       const cartData = await cartRes.json();
-      console.log('Cart initialized:', cartData);
+
       setCartId(cartData.cartId);
-      setCartItems(cartData.items || []);
+      setCartItems(Array.isArray(cartData.items) ? cartData.items : []);
     } catch (error) {
-      console.error('Error initializing cart:', error);
+      console.error('Cart init error:', error);
+      setCartItems([]);
     } finally {
       setLoading(false);
     }
   };
 
+  
   const fetchCartItems = async () => {
     if (!cartId) return;
-    
+
     try {
       const res = await fetch(`/api/cart?cartId=${cartId}`);
       const data = await res.json();
-      setCartItems(data || []);
+
+      if (Array.isArray(data)) {
+        setCartItems(data);
+      } else if (Array.isArray(data.items)) {
+        setCartItems(data.items);
+      } else {
+        setCartItems([]);
+      }
     } catch (error) {
-      console.error('Error fetching cart items:', error);
+      console.error('Fetch cart error:', error);
+      setCartItems([]);
     }
   };
 
+  
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      await removeItem(itemId);
+      removeItem(itemId);
       return;
     }
 
     try {
-      await fetch(`/api/cart/${itemId}`, {
+      const res = await fetch(`/api/cart/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: newQuantity })
+        body: JSON.stringify({ quantity: newQuantity }),
       });
-      fetchCartItems();
+
+      if (!res.ok) throw new Error();
+
+      // optimistic update
+      setCartItems(prev =>
+        prev.map(item =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        )
+      );
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      console.error('Update quantity error:', error);
     }
   };
 
+  
   const removeItem = async (itemId: string) => {
     try {
-      await fetch(`/api/cart/${itemId}`, {
-        method: 'DELETE'
+      const res = await fetch(`/api/cart/${itemId}`, {
+        method: 'DELETE',
       });
-      fetchCartItems();
+
+      if (!res.ok) throw new Error();
+
+      // optimistic remove
+      setCartItems(prev =>
+        Array.isArray(prev) ? prev.filter(item => item.id !== itemId) : []
+      );
     } catch (error) {
-      console.error('Error removing item:', error);
+      console.error('Remove item error:', error);
     }
   };
 
+  
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
       if (!item.product) return total;
-      return total + (item.product.price * item.quantity);
+      return total + item.product.price * item.quantity;
     }, 0);
   };
 
+  
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading cart...</div>
+        <p className="text-xl">Loading cart...</p>
       </div>
     );
   }
 
+  
+ 
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-        <p className="text-gray-600 mb-8">Add some items to get started!</p>
+        <p className="text-gray-600 mb-8">Add items to get started.</p>
         <button
           onClick={() => router.push('/')}
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700"
+          className="bg-gray-900 text-white px-8 py-3 rounded-lg"
         >
           Go to Home
         </button>
@@ -147,54 +169,61 @@ export default function CartPage() {
     );
   }
 
+  
+  
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Navbar/>
+      <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map((item) => {
+            {cartItems.map(item => {
               if (!item.product) return null;
-              
+
               return (
                 <div
                   key={item.id}
                   className="bg-white rounded-lg shadow p-6 flex gap-4"
                 >
-                  <div className="w-24 h-24 relative flex-shrink-0">
-                    <Image
-                      src={item.product.image}
-                      alt={item.product.name}
-                      width={96}
-                      height={96}
-                      className="object-cover rounded w-full h-full"
-                    />
-                  </div>
+                  <Image
+                    src={item.product.image}
+                    alt={item.product.name}
+                    width={96}
+                    height={96}
+                    className="rounded object-cover"
+                  />
 
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="font-semibold text-lg">
                       {item.product.name}
                     </h3>
-                    
-                    <div className="text-sm text-gray-600 mb-3">
-                      {item.size && <span>Size: {item.size}</span>}
-                      {item.size && item.color && <span className="mx-2">•</span>}
-                      {item.color && <span>Color: {item.color}</span>}
-                    </div>
 
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center border rounded">
+                    <p className="text-sm text-gray-600 mt-1">
+                      {item.size && `Size: ${item.size}`}{" "}
+                      {item.color && `• Color: ${item.color}`}
+                    </p>
+
+                    <div className="flex items-center gap-4 mt-3">
+                      <div className="flex border rounded">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="px-3 py-1 hover:bg-gray-100"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          className="px-3 py-1"
                         >
                           -
                         </button>
-                        <span className="px-4 py-1 border-x">{item.quantity}</span>
+                        <span className="px-4 py-1 border-x">
+                          {item.quantity}
+                        </span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="px-3 py-1 hover:bg-gray-100"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          className="px-3 py-1"
                         >
                           +
                         </button>
@@ -202,7 +231,7 @@ export default function CartPage() {
 
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        className="text-red-600 text-sm"
                       >
                         Remove
                       </button>
@@ -210,10 +239,10 @@ export default function CartPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-lg font-semibold">
+                    <p className="font-semibold">
                       ${(item.product.price * item.quantity).toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-500">
                       ${item.product.price.toFixed(2)} each
                     </p>
                   </div>
@@ -222,42 +251,42 @@ export default function CartPage() {
             })}
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-8">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+          {/* Summary */}
+          <div className="bg-white rounded-lg shadow p-6 h-fit">
+            <h2 className="text-xl font-bold mb-4">Order Summary</h2>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-semibold">Free</span>
-                </div>
-                <div className="border-t pt-3 flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${calculateTotal().toFixed(2)}</span>
               </div>
-
-              <button
-                onClick={() => router.push(`/checkout?cartId=${cartId}`)}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold"
-              >
-                Proceed to Checkout
-              </button>
-
-              <button
-                onClick={() => router.push('/')}
-                className="w-full mt-3 border border-gray-300 py-3 rounded-lg hover:bg-gray-50 font-semibold"
-              >
-                Continue Shopping
-              </button>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+              <div className="border-t pt-3 flex justify-between font-bold">
+                <span>Total</span>
+                <span>${calculateTotal().toFixed(2)}</span>
+              </div>
             </div>
+
+            <button
+              onClick={() => router.push(`/checkout?cartId=${cartId}`)}
+              className="w-full bg-gray-900 text-white py-3 rounded-lg"
+            >
+              Proceed to Checkout
+            </button>
+
+            <button
+              onClick={() => router.push('/')}
+              className="w-full mt-3 border py-3 rounded-lg bg-gray-900 text-white"
+            >
+              Continue Shopping
+            </button>
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

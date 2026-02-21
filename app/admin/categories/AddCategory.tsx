@@ -57,7 +57,7 @@ export function AddCategory({ handleUpdateLocalState }: IAddCategoryProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 border-b-4 border-t-4 bg-black text-white hover:bg-amber-100">
+        <Button variant="outline" className="flex items-center gap-2 border-b-4 border-t-4 bg-white text-black hover:bg-amber-100">
           <Plus className="h-4 w-4" />
           Add New Category
         </Button>
