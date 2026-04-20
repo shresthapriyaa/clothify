@@ -49,8 +49,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { userId, items, total } = body;
 
-        console.log("Received order data:", { userId, items, total });
-
         // Validation
         if (!userId || !items || items.length === 0) {
             return NextResponse.json({

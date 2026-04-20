@@ -316,6 +316,7 @@ export default function ProductDetailPage() {
                       src={img}
                       alt={`${product.name} view ${index + 1}`}
                       fill
+                      sizes="(max-width: 768px) 25vw, 20vw"
                       className="object-cover"
                     />
                   </button>

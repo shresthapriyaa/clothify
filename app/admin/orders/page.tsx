@@ -1,6 +1,7 @@
 'use client'
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { ShoppingCart, Plus } from "lucide-react"
 import { IUser, IProduct, IOrder } from "./types/types"
 import { AddOrder } from "./AddOrder"
 import { TableOrders } from "./TableOrders"
@@ -25,7 +26,6 @@ function OrdersPage() {
 
             setOrders(ordersRes.data.data || ordersRes.data || [])
             
-            // Normalize users data
             const rawUsers = usersRes.data.data || usersRes.data || []
             const normalizedUsers = rawUsers.map((u: any) => ({
                 ...u,
@@ -59,27 +59,49 @@ function OrdersPage() {
         }
     }
 
-    return (
-        <div className="flex flex-col m-5">
-            <div className="flex justify-between mb-4">
-                <div className="text-xl font-semibold">All Orders</div>
-                <AddOrder 
-                    users={users} 
-                    products={products} 
-                    handleUpdateLocalState={handleUpdateLocalState} 
-                />
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen bg-gray-50">
+                <div className="text-gray-600">Loading orders...</div>
             </div>
-            <div className="w-full">
-                {loading ? (
-                    <div className="text-center p-8">Loading...</div>
-                ) : (
+        )
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-6">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-purple-100 p-3 rounded-lg">
+                                <ShoppingCart className="h-6 w-6 text-purple-600" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+                                <p className="text-gray-600">Track and manage customer orders</p>
+                            </div>
+                        </div>
+                        <AddOrder 
+                            users={users} 
+                            products={products} 
+                            handleUpdateLocalState={handleUpdateLocalState} 
+                        />
+                    </div>
+                </div>
+
+                {/* Orders Table */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-semibold text-gray-900">All Orders ({orders.length})</h2>
+                    </div>
                     <TableOrders 
                         orders={orders}
                         users={users}
                         products={products}
                         handleUpdateLocalState={handleUpdateLocalState}
                     />
-                )}
+                </div>
             </div>
         </div>
     )

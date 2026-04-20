@@ -11,6 +11,11 @@ import {
   Settings,
   ShoppingCart,
   LogOut,
+  ChevronRight,
+  ChevronsUpDown,
+  Bell,
+  CreditCard,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -21,7 +26,18 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarRail,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const items = [
   { title: "Dashboard", url: "/admin", icon: Home },
@@ -32,7 +48,7 @@ const items = [
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
   const pathname = usePathname();
 
@@ -40,52 +56,126 @@ export function AppSidebar() {
     signOut({ callbackUrl: "/" }); 
   };
 
-  
-
-
   return (
+    <Sidebar collapsible="icon" {...props}>
+      {/* Header */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <div className="flex items-center gap-2">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Package className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Admin Panel</span>
+                  <span className="truncate text-xs">Enterprise</span>
+                </div>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-    <Sidebar className="h-full min-h-screen border-r flex flex-col">
-      <SidebarContent className="flex-1">
+      {/* Content */}
+      <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-
-                    <Link
-                      href={item.url}
-                      className={`flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition ${
-                        pathname === item.url ? "bg-gray-200 font-semibold" : ""
-                      }`}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-
-              {/* Logout button just after Settings */}
-              {session && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 p-2 w-full bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span>Logout</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
+              {items.map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Footer */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium">
+                    {session?.user?.name?.charAt(0)?.toUpperCase() || 
+                     session?.user?.email?.charAt(0)?.toUpperCase() || "A"}
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {session?.user?.name || "Admin"}
+                    </span>
+                    <span className="truncate text-xs">
+                      {session?.user?.email || "admin@example.com"}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side="bottom"
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium">
+                      {session?.user?.name?.charAt(0)?.toUpperCase() || 
+                       session?.user?.email?.charAt(0)?.toUpperCase() || "A"}
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">
+                        {session?.user?.name || "Admin"}
+                      </span>
+                      <span className="truncate text-xs">
+                        {session?.user?.email || "admin@example.com"}
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Sparkles />
+                  Upgrade to Pro
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <User />
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <CreditCard />
+                  Billing
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Bell />
+                  Notifications
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

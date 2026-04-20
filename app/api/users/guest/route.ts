@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
           isVerified: false
         }
       });
-      console.log('Created guest user:', user.id);
     }
     
     return NextResponse.json({ 

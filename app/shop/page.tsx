@@ -2,14 +2,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import WishlistButton from '@/components/WishlistButton';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
 
 interface Product {
   id: string;
@@ -26,14 +27,63 @@ interface Product {
 
 export default function ShopPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [cartId, setCartId] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchProducts();
     initializeCart();
   }, []);
+
+  useEffect(() => {
+    // Get search parameter from URL when searchParams change
+    const urlSearch = searchParams.get('search');
+    console.log('URL search parameter:', urlSearch);
+    
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+    } else {
+      setSearchQuery('');
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    // Filter products when search query or products change
+    if (products.length === 0) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    if (!searchQuery.trim()) {
+      setFilteredProducts(products);
+    } else {
+      const searchTerm = searchQuery.toLowerCase().trim();
+      
+      const filtered = products.filter(product => {
+        const productName = product.name?.toLowerCase() || '';
+        const categoryName = product.category?.name?.toLowerCase() || '';
+        
+        // For category searches, match exact category only
+        if (searchTerm === 'men' || searchTerm === 'women' || searchTerm === 'bag' || searchTerm === 'bags') {
+          // Exact category match only
+          if (searchTerm === 'men' && categoryName === 'men') return true;
+          if (searchTerm === 'women' && categoryName === 'women') return true;
+          if ((searchTerm === 'bag' || searchTerm === 'bags') && categoryName === 'bag') return true;
+          
+          return false;
+        }
+        
+        // For other searches, match product name
+        return productName.includes(searchTerm);
+      });
+      
+      setFilteredProducts(filtered);
+    }
+  }, [searchQuery, products]);
 
   const initializeCart = async () => {
     try {
@@ -110,6 +160,21 @@ export default function ShopPage() {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Update URL with search parameter
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) {
+      params.set('search', searchQuery.trim());
+    }
+    router.push(`/shop?${params.toString()}`);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    router.push('/shop');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -137,18 +202,77 @@ export default function ShopPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Shop All Products</h1>
-          <p className="text-gray-600">Discover our collection of premium products</p>
+          {searchQuery ? (
+            <>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Search Results for "{searchQuery}"
+              </h1>
+              <p className="text-gray-600">
+                {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Shop All Products</h1>
+              <p className="text-gray-600">Discover our collection of premium products</p>
+            </>
+          )}
         </div>
 
-        {products.length === 0 ? (
+        {/* Search Bar */}
+        <div className="mb-8">
+          <form onSubmit={handleSearch} className="flex gap-4 max-w-md">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </form>
+          
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              {filteredProducts.length} result{filteredProducts.length !== 1 ? 's' : ''} for "{searchQuery}"
+            </p>
+          )}
+        </div>
+
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-xl text-gray-600 mb-2">No products found</p>
-            <p className="text-gray-500">Check back soon for new items</p>
+            {searchQuery ? (
+              <>
+                <p className="text-xl text-gray-600 mb-2">No products found for "{searchQuery}"</p>
+                <p className="text-gray-500 mb-4">Try searching with different keywords</p>
+                <button
+                  onClick={clearSearch}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  View all products
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-xl text-gray-600 mb-2">No products found</p>
+                <p className="text-gray-500">Check back soon for new items</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.id}`}
@@ -163,6 +287,7 @@ export default function ShopPage() {
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover"
+                      loading="eager"
                     />
                     
                     {/* Wishlist Button  */}

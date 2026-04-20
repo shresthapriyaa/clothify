@@ -8,11 +8,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }  // Changed: params is now a Promise in Next.js 15
 ) {
   try {
-    console.log(' GET /api/products/[id] called');
     
     // Await the params - CRITICAL for Next.js 15+
     const { id } = await context.params;
-    console.log('Product ID:', id);
 
     if (!id) {
       console.error(' No ID provided');
@@ -21,8 +19,6 @@ export async function GET(
         { status: 400 }
       );
     }
-
-    console.log('🔍 Searching for product with ID:', id);
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -37,15 +33,12 @@ export async function GET(
         select: { id: true, name: true },
         take: 5
       });
-      console.log('Available products:', allProducts);
       
       return NextResponse.json(
         { error: "Product not found" }, 
         { status: 404 }
       );
     }
-
-    console.log(' Product found:', product.name);
 
     return NextResponse.json(
       { 

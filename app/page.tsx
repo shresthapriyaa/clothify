@@ -2222,6 +2222,7 @@ export default function HomePage() {
               src={product.image}
               alt={product.name}
               fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
               className="object-cover"
             />
           ) : (
@@ -2280,6 +2281,7 @@ export default function HomePage() {
                   src="/Fashoin.jpeg"
                   alt="Fashion Model"
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
                 />
@@ -2375,6 +2377,7 @@ export default function HomePage() {
                   src={cat.image}
                   alt={cat.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40"></div>
