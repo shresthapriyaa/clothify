@@ -1,10 +1,6 @@
 'use client';
 
-
-export const dynamic = "force-dynamic";
-
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
@@ -35,7 +31,7 @@ interface CheckoutForm {
   phone: string;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cartId = searchParams.get('cartId');
@@ -283,5 +279,17 @@ export default function CheckoutPage() {
       </div>
       <Footer/>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading checkout...</div>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }
