@@ -225,13 +225,13 @@ export default function CheckoutPage() {
                   if (!item.product) return null;
                   return (
                     <div key={item.id} className="flex gap-4">
-                      <div className="w-16 h-16 relative flex">
+                      <div className="w-16 h-16 relative bg-gray-100 rounded overflow-hidden">
                         <Image
                           src={item.product.image}
                           alt={item.product.name}
-                          width={64}
-                          height={64}
-                          className="object-cover rounded w-full h-full"
+                          fill
+                          sizes="64px"
+                          className="object-cover"
                         />
                       </div>
                       <div className="flex-1">

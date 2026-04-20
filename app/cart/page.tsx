@@ -188,13 +188,15 @@ export default function CartPage() {
                   key={item.id}
                   className="bg-white rounded-lg shadow p-6 flex gap-4"
                 >
-                  <Image
-                    src={item.product.image}
-                    alt={item.product.name}
-                    width={96}
-                    height={96}
-                    className="rounded object-cover"
-                  />
+                  <div className="w-24 h-24 relative bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                    <Image
+                      src={item.product.image}
+                      alt={item.product.name}
+                      fill
+                      sizes="96px"
+                      className="object-cover"
+                    />
+                  </div>
 
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">
